@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="card"><h2>Новое задание</h2>
+<form method="post">
+<label>Название</label><input name="title" required>
+<label>Описание</label><textarea name="description" rows="4"></textarea>
+<label>Тип</label>
+<select name="type" id="type" onchange="toggleFields()">
+{% for key,label in types.items() %}<option value="{{key}}">{{label}}</option>{% endfor %}
+</select>
+
+<div id="planned">
+<label>Дата выполнения (для обычного задания)</label>
+<input type="date" name="planned_date" min="{{today}}">
+</div>
+
+<div id="due">
+<label>Дедлайн (для долгосрочного задания)</label>
+<input type="date" name="due_date" min="{{today}}">
+</div>
+
+<label><input style="width:auto" type="checkbox" name="requires_review">
+Требует проверки постановщиком</label><br><br>
+<button>Создать задание</button>
+<a class="btn gray" href="/dashboard">Отмена</a>
+</form></div>
+
+<script>
+function toggleFields(){
+  const type=document.getElementById('type').value;
+  document.getElementById('planned').style.display=type==='normal'?'block':'none';
+  document.getElementById('due').style.display=type==='long'?'block':'none';
+}
+toggleFields();
+</script>
+{% endblock %}

@@ -1,0 +1,61 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="grid">
+<div class="card">
+<h2>{{ "Панель постановщика" if user.role=="giver" else "Мои задания" }}</h2>
+{% if user.role=="giver" %}<a class="btn" href="/task/new">+ Создать задание</a>{% endif %}
+</div>
+<div class="card"><h3>Уведомления</h3>
+<div id="live-notifications">
+{% for n in notifications %}
+<div style="margin:8px 0"><b>{{"🔔 " if not n.is_read}}{{n.text}}</b><div class="small">{{n.created_at}}</div></div>
+{% else %}<span class="small">Нет уведомлений</span>{% endfor %}
+</div>
+<form method="post" action="/notifications/read"><button class="gray">Отметить прочитанными</button></form>
+</div>
+</div>
+
+<h2>Задания</h2>
+{% for t in tasks %}
+<div class="card task {{t.type}}">
+<div>
+<span class="badge">{{types[t.type]}}</span>
+<span class="badge status-{{t.status}}">
+{{ {'open':'Открыто','submitted':'На проверке','completed':'Выполнено','rejected':'Отклонено'}[t.status] }}
+</span>
+{% if t.requires_review %}<span class="badge">Нужна проверка</span>{% endif %}
+</div>
+<h3>{{t.title}}</h3>
+{% if t.description %}<p>{{t.description}}</p>{% endif %}
+{% if t.planned_date %}<p><b>Запланировано:</b> {{t.planned_date}}</p>{% endif %}
+{% if t.due_date %}<p><b>Дедлайн:</b> {{t.due_date}}</p>{% endif %}
+{% if t.rejection_reason %}<p class="error"><b>Причина отклонения:</b> {{t.rejection_reason}}</p>{% endif %}
+
+{% if user.role=="executor" and t.status in ['open','rejected'] %}
+<form method="post" action="/task/{{t.id}}/complete">
+<button class="green">{{"Отправить на проверку" if t.requires_review else "Отметить выполненным"}}</button>
+</form>
+{% endif %}
+
+{% if user.role=="giver" and t.status=="submitted" %}
+<form method="post" action="/task/{{t.id}}/review" style="display:inline-block">
+<input type="hidden" name="decision" value="approve"><button class="green">Подтвердить</button>
+</form>
+<form method="post" action="/task/{{t.id}}/review">
+<input type="hidden" name="decision" value="reject">
+<input name="reason" placeholder="Причина отклонения" required>
+<button class="red">Отклонить</button>
+</form>
+{% endif %}
+</div>
+{% else %}<div class="card">Заданий пока нет.</div>{% endfor %}
+
+<h2>Журнал активности</h2>
+<div class="card">
+{% for a in activity %}
+<div style="padding:8px 0;border-bottom:1px solid #eee">
+<b>{{a.username}}</b>: {{a.action}} <span class="small">— {{a.created_at}}</span>
+</div>
+{% else %}Нет записей.{% endfor %}
+</div>
+{% endblock %}

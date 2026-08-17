@@ -1,0 +1,46 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>TaskPair</title>
+<style>
+*{box-sizing:border-box}body{font-family:Arial,sans-serif;background:#f4f6f8;margin:0;color:#20252b}
+nav{background:#17202a;color:white;padding:14px 22px;display:flex;justify-content:space-between}
+nav a{color:white;text-decoration:none}.container{max-width:1100px;margin:24px auto;padding:0 16px}
+.card{background:white;border-radius:12px;padding:18px;margin:12px 0;box-shadow:0 2px 10px #00000010}
+a{color:#2563eb;text-decoration:none}.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:12px}
+button,.btn{background:#2563eb;color:white;border:0;border-radius:8px;padding:9px 13px;cursor:pointer;text-decoration:none;display:inline-block}
+button.gray,.btn.gray{background:#64748b}.btn.green,button.green{background:#16a34a}.btn.red,button.red{background:#dc2626}
+input,textarea,select{width:100%;padding:9px;margin:5px 0 12px;border:1px solid #ccd3da;border-radius:7px}
+.badge{display:inline-block;padding:4px 8px;border-radius:99px;background:#e5e7eb;font-size:12px;margin-right:4px}
+.status-open{background:#dbeafe}.status-submitted{background:#fef3c7}.status-completed{background:#dcfce7}.status-rejected{background:#fee2e2}
+.small{font-size:13px;color:#64748b}.error{color:#b91c1c}.success{color:#15803d}
+.task{border-left:5px solid #94a3b8}.task.long{border-left-color:#7c3aed}.task.normal{border-left-color:#2563eb}.task.instant{border-left-color:#16a34a}.task.complex{border-left-color:#ea580c}
+</style>
+</head>
+<body>
+<nav><b>TaskPair</b><span>{{ user.username }} — {{ "Постановщик" if user.role=="giver" else "Исполнитель" }} · <a href="/logout">Выйти</a></span></nav>
+<div class="container">
+{% with messages=get_flashed_messages(with_categories=true) %}
+{% for category,msg in messages %}<div class="card {{category}}">{{msg}}</div>{% endfor %}
+{% endwith %}
+{% block content %}{% endblock %}
+</div>
+<script>
+async function refreshNotifications(){
+  try{
+    const r=await fetch('/api/notifications');
+    if(!r.ok)return;
+    const data=await r.json();
+    const box=document.getElementById('live-notifications');
+    if(!box)return;
+    box.innerHTML=data.length ? data.map(n =>
+      `<div style="margin:8px 0"><b>${n.is_read?'':'🔔 '}${n.text}</b><div class="small">${n.created_at}</div></div>`
+    ).join('') : '<span class="small">Нет уведомлений</span>';
+  }catch(e){}
+}
+setInterval(refreshNotifications,10000);
+</script>
+</body>
+</html>

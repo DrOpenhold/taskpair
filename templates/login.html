@@ -1,0 +1,15 @@
+<!doctype html>
+<html lang="ru"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>TaskPair — вход</title>
+<style>
+body{font-family:Arial;background:#f4f6f8}.box{max-width:380px;margin:12vh auto;background:white;padding:25px;border-radius:14px;box-shadow:0 3px 15px #0002}
+input,button{width:100%;box-sizing:border-box;padding:11px;margin:7px 0}button{background:#2563eb;color:#fff;border:0;border-radius:7px}
+.error{color:#b91c1c}.small{font-size:13px;color:#64748b}
+</style></head><body><div class="box">
+<h1>TaskPair</h1><p>Система заданий для двух человек</p>
+{% with messages=get_flashed_messages(with_categories=true) %}
+{% for category,msg in messages %}<p class="{{category}}">{{msg}}</p>{% endfor %}{% endwith %}
+<form method="post"><label>Логин</label><input name="username" required>
+<label>Пароль</label><input type="password" name="password" required><button>Войти</button></form>
+<p class="small">Постановщик: giver / giver123<br>Исполнитель: executor / executor123</p>
+</div></body></html>
